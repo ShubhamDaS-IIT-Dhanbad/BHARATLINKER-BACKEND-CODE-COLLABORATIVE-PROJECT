@@ -1,29 +1,67 @@
-// EXPRESS
-import  express  from "express"
-import cors from "cors"
-import cookieParser from "cookie-parser"
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import morgan from 'morgan';
+// import rateLimit from 'express-rate-limit';
+import dotenv from 'dotenv';
 
-const app = express()
-app.use(cors({
-  origin:"*",
-  credential:true
-}))
+// Load environment variables from .env file
+dotenv.config();
 
-app.use(express.json({limit: "16kb"}))
+const app = express();
+
+// Security middleware
+app.use(helmet());
+
+// CORS setup
+const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
+app.use(cors(corsOptions));
+
+// Logging middleware
+app.use(morgan('combined'));
+
+// Rate limiting
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+// });
+// app.use(limiter);
+
+// Body parsing middleware
+app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"))
-app.use(cookieParser())
+app.use(express.static('public'));
+app.use(cookieParser());
 
-//routes import
-import userRouter from './src/api/routes/userRoutes.js'
-import retailerRouter from './src/api/routes/retailerRoutes.js'
-import productRouter from './src/api/routes/productRoutes.js'
-import shopRouter from './src/api/routes/shopRoutes.js'
+// Routes import
+import userRouter from './src/api/routes/userRoutes.js';
+import retailerRouter from './src/api/routes/retailerRoutes.js';
+import productRouter from './src/api/routes/productRoutes.js';
+import shopRouter from './src/api/routes/shopRoutes.js';
 
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
 
-app.use("/api/v1/account", userRouter)
+app.use('/api/v1/account', userRouter);
+app.use('/api/v1/product', productRouter);
+app.use('/api/v1/retailer', retailerRouter);
+app.use('/api/v1/shop', shopRouter);
 
-app.use("/api/v1/retailer", retailerRouter)
-app.use("/api/v1/shop", shopRouter)
-app.use("/api/v1/product", productRouter)
-export {app}
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+export { app };

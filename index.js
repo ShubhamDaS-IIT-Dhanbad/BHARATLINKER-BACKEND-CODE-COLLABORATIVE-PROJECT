@@ -1,17 +1,57 @@
+// server.js
 import dotenv from 'dotenv';
-import connectDB from "./src/config/db.js";
+import connectDB from './src/config/db.js';
 import { app } from './app.js';
+import winston from 'winston';
+import mongoose from 'mongoose';
 
-dotenv.config({
-    path: './.env'
+// Load environment variables
+dotenv.config();
+
+// Set up winston logger
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.colorize(),
+    winston.format.simple()
+  ),
+  transports: [
+    new winston.transports.Console(),
+  ],
 });
 
-const port = process.env.PORT || 12000; // Default port 12000 if PORT environment variable is not provided
+const port = process.env.PORT || 3000;
 
-connectDB().then(() => {
+connectDB()
+  .then(() => {
     app.listen(port, () => {
-        console.log(`Server is running at port: ${port}`);
+      logger.info(`Server is running at port: ${port}`);
     });
-}).catch((err) => {
-    console.log("MongoDB connection failed:", err);
+  })
+  .catch((err) => {
+    logger.error('MongoDB connection failed:', err);
+    process.exit(1);
+  });
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
+
+// Graceful shutdown
+const shutdown = (signal) => {
+  process.on(signal, () => {
+    logger.info(`Received ${signal}. Shutting down gracefully...`);
+    app.close(() => {
+      logger.info('HTTP server closed.');
+      mongoose.connection.close(false, () => {
+        logger.info('MongoDB connection closed.');
+        process.exit(0);
+      });
+    });
+  });
+};
+
+['SIGINT', 'SIGTERM'].forEach((signal) => shutdown(signal));
+
