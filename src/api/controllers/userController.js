@@ -56,6 +56,7 @@ const logIn = asyncHandler(async (req, res) => {
     if (!mobileNumber) throw new ApiError(400, "Phone Number Required!")
 
     const user = await User.findOne({ mobileNumber })
+    console.log("ji",user)
     if (!user) { throw new ApiError(409, "user does not exist") }
 
     const { accessToken, refreshToken } = await generateAccessRefreshTokens(user._id)
