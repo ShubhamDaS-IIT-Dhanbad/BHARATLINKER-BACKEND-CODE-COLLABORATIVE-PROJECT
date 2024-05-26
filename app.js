@@ -3,18 +3,14 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import morgan from 'morgan';
-// import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
-// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
 
-// Security middleware
 app.use(helmet());
 
-// CORS setup
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 const corsOptions = {
   origin: function (origin, callback) {

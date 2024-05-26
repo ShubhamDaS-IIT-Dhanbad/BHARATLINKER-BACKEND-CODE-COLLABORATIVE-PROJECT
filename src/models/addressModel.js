@@ -1,5 +1,6 @@
-import mongoose, {Schema} from "mongoose";
-const addressSchema = new Schema({
+import mongoose from "mongoose";
+
+const addressSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -9,9 +10,7 @@ const addressSchema = new Schema({
         type: String,
         required: true
     },
-    landMark:{
-        type: String
-    },
+    landMark: String,
     city: {
         type: String,
         required: true
@@ -22,7 +21,13 @@ const addressSchema = new Schema({
     },
     pin: {
         type: String,
-        required: true
+        required: true,
+        validate: {
+            validator: function(v) {
+                return /^\d{6}$/.test(v); // Validate pin code format (6 digits)
+            },
+            message: props => `${props.value} is not a valid pin code!`
+        }
     },
     country: {
         type: String,
@@ -30,7 +35,16 @@ const addressSchema = new Schema({
     },
     phoneNumber: {
         type: String,
-        required: true
+        required: true,
+        validate: {
+            validator: function(v) {
+                return /^\d{10}$/.test(v); // Validate phone number format (10 digits)
+            },
+            message: props => `${props.value} is not a valid phone number!`
+        }
     }
-},{timestamps: true});
-export const Address = mongoose.model("Address", addressSchema)
+}, { timestamps: true });
+
+const Address = mongoose.model("Address", addressSchema);
+
+export { Address };
