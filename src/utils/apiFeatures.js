@@ -9,36 +9,42 @@ class ApiFeatures {
             const words = keyword.split(/\s+/);
             const regex = new RegExp(keyword, 'i');
             const numberKeyword = parseFloat(keyword);
+    
             let searchConditions = [
                 { title: { $regex: regex } },
                 { description: { $regex: regex } },
-                { categories: { $in: [keyword] } }
+                { category: { $elemMatch: { $regex: regex } } }, // Using $elemMatch with $regex
+                { brand: { $regex: regex } },
+                { keyWords: { $elemMatch: { $regex: regex } } } // Using $elemMatch with $regex
             ];
+    
             // Add conditions for each word in the query
             words.forEach(word => {
                 const wordRegex = new RegExp(word, 'i');
                 searchConditions.push({ title: { $regex: wordRegex } });
                 searchConditions.push({ description: { $regex: wordRegex } });
-                searchConditions.push({ categories: { $in: [word] } });
-                // Include conditions for individual categories
-                searchConditions.push({ "categories.0": { $regex: wordRegex } });
-                searchConditions.push({ "categories.1": { $regex: wordRegex } });
-                searchConditions.push({ "categories.2": { $regex: wordRegex } });
-                // Add more lines if you have more categories in your schema
+                searchConditions.push({ category: { $elemMatch: { $regex: wordRegex } } });
+                searchConditions.push({ brand: { $regex: wordRegex } });
+                searchConditions.push({ keyWords: { $elemMatch: { $regex: wordRegex } } });
             });
+    
             // If keyword is a number, include number-specific search conditions
             if (!isNaN(numberKeyword)) {
                 searchConditions.push({ price: numberKeyword });
                 searchConditions.push({ id: numberKeyword });
             }
-
+    
             this.query = this.query.find({
                 $or: searchConditions
             });
         }
         return this;
     }
-
+    
+    
+    
+    
+    
     pagination(resultPerPage) {
         const currentPage = parseInt(this.queryStr.page) || 1;
         const limit = parseInt(this.queryStr.limit) || resultPerPage;
