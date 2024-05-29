@@ -7,17 +7,20 @@ const sendMail = async (req, res) => {
 
         // Create a transporter
         const transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
+            service:'gmail',
+            host: 'smtp.gmail.com',
             port: 587,
             auth: {
-                user: 'cara31@ethereal.email',
-                pass: 'urguAkR7MzSgWnmkkU'
+                user: 'shubhamdasiitcs@gmail.com',
+                pass: 'kuqimptzbndweacm'
             }
         });
 
         // Define email options
         let mailOptions = {
-            from: '"Test Sender" <shubhamdasiitcs@gmail.com>', // Sender address
+            from: {
+                name:'bharat blinker',
+            },
             to: "motofirstmy@gmail.com",                    // List of receivers
             subject: "Test Email",                          // Subject line
             text: "shubh!", // Plain text body

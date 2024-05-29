@@ -24,6 +24,7 @@ const generateAccessRefreshTokens = async (userId) => {
 }
 //registeruser
 const registerRetailer = asyncHandler(async (req, res) => {
+    console.log("koko")
     const {name,email,pan,gstin,phoneNumber,role} = req.body
     if ([name,email,pan,gstin,phoneNumber,role].some((field) => {
         field?.trim() === ""

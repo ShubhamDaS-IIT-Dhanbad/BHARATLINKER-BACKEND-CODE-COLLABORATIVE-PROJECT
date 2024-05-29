@@ -55,7 +55,7 @@ retailerSchema.methods.generateAccessToken = function () {
             email: this.email,
             fullName: this.fullName
         },
-        process.env.ACCESS_TOKEN_SECRET_key,
+        process.env.ACCESS_TOKEN_SECRET_KEY,
         {
             expiresIn: process.env.ACCESS_TOKEN_EXPIRY
         }
@@ -67,7 +67,7 @@ retailerSchema.methods.generateRefreshToken = function () {
             _id: this._id,
 
         },
-        process.env.REFRESH_TOKEN_SECRET_kEY, {
+        process.env.REFRESH_TOKEN_SECRET_KEY, {
         expiresIn: process.env.REFRESH_TOKEN_EXPIRY
     }
     )

@@ -22,16 +22,12 @@ const createProduct = asyncHandler(async (req, res, next) => {
     images.push(imageUrl.url);
   }
   req.body.images = images;
-  // const retailer = await Retailer.findById(req.cookies.retailer._id)
-  // console.log(retailer)
-  // req.body.shop=retailer.shop
   const product = await Product.create(req.body);
   res.status(201).json({
     success: true,
     product
   });
 });
-
 
 // Get All Product
 const getAllProducts = asyncHandler(async (req, res, next) => {
