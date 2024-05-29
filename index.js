@@ -1,13 +1,14 @@
+// server.js
 import dotenv from 'dotenv';
 import connectDB from './src/config/db.js';
 import { app } from './app.js';
 import winston from 'winston';
 import mongoose from 'mongoose';
-import express from 'express';
-import path from 'path';
 
+// Load environment variables
 dotenv.config();
 
+// Set up winston logger
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
@@ -21,12 +22,6 @@ const logger = winston.createLogger({
 
 const port = process.env.PORT || 3000;
 
-const __dirname = path.resolve();
-
-// Serve static files from the 'dist' directory
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Connect to the database and start the server
 connectDB()
   .then(() => {
     app.listen(port, () => {
@@ -60,7 +55,3 @@ const shutdown = (signal) => {
 
 ['SIGINT', 'SIGTERM'].forEach((signal) => shutdown(signal));
 
-// Serve your frontend
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
