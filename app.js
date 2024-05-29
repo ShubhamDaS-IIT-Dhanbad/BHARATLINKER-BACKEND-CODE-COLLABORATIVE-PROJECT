@@ -20,7 +20,7 @@ const corsOptions = {
   },
 };
 app.use(cors({
-  origin:"https://bharatshop.shop",
+  origin:"https://bharatlinker.shop",
 }));
 
 // Logging middleware
