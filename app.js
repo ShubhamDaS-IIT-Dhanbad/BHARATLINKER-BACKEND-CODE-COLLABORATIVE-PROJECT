@@ -19,9 +19,7 @@ const corsOptions = {
     }
   },
 };
-app.use(cors({
-  origin:"https://bharatlinker.shop",
-}));
+app.use(cors(corsOptions));
 
 // Logging middleware
 app.use(morgan('combined'));
