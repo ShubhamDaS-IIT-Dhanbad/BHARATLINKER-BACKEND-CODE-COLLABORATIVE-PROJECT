@@ -1,5 +1,4 @@
-import express from 'express';
-import cors from 'cors';
+// server.js
 import dotenv from 'dotenv';
 import connectDB from './src/config/db.js';
 import { app } from './app.js';
@@ -22,11 +21,6 @@ const logger = winston.createLogger({
 });
 
 const port = process.env.PORT || 3000;
-
-// Enable CORS
-app.use(cors({
-  origin: 'https://www.bharatlinker.shop' // replace with your frontend URL
-}));
 
 connectDB()
   .then(() => {
@@ -60,3 +54,4 @@ const shutdown = (signal) => {
 };
 
 ['SIGINT', 'SIGTERM'].forEach((signal) => shutdown(signal));
+
