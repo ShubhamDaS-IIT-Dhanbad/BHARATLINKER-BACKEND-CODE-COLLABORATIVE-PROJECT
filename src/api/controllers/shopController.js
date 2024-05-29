@@ -2,9 +2,11 @@ import { ApiResponse } from '../../utils/apiResponse.js'
 import { Shop } from "../../models/shopModel.js";
 import { Retailer } from "../../models/retailerModel.js";
 
+
 import { ApiError } from '../../utils/apiError.js'
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiFeatures } from "../../utils/apiFeatures.js";
+import { uploadOnCloudinary } from "../../utils/cloudinary.js";
 
 //add shop modifiued by chargpt
 const registerShop = asyncHandler(async (req, res) => {
