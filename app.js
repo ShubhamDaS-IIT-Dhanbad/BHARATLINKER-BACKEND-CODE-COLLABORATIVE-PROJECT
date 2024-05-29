@@ -19,7 +19,9 @@ const corsOptions = {
     }
   },
 };
-app.use(cors(corsOptions));
+app.use(cors({
+  origin:"https://bharatshop.shop",
+}));
 
 // Logging middleware
 app.use(morgan('combined'));
