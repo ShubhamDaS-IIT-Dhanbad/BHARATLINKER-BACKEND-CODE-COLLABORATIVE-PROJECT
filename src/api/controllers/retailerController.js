@@ -25,7 +25,8 @@ const generateAccessRefreshTokens = async (userId) => {
 //registeruser
 const registerRetailer = asyncHandler(async (req, res) => {
     console.log("koko")
-    const {name,email,pan,gstin,phoneNumber,role} = req.body
+    const {name,email,pan,gstin,phoneNumber,role,key} = req.body
+    console.log(req.body)
     if ([name,email,pan,gstin,phoneNumber,role].some((field) => {
         field?.trim() === ""
     })
@@ -37,7 +38,7 @@ const registerRetailer = asyncHandler(async (req, res) => {
     if (existedUser) { throw new ApiError(409, "User Already Exist") }
 
     const retailer = await Retailer.create({
-        name,email,pan,gstin,phoneNumber,role
+        name,email,pan,gstin,phoneNumber,role,key
     })
     const  createdRetailer = await Retailer.findById(retailer._id).select("-password -refreshToken")
     if (! createdRetailer) throw new ApiError(500, "Something went wrong while registering the user")

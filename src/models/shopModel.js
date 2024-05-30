@@ -20,7 +20,7 @@ const shopSchema = new Schema({
     shopStatus: {
         type: Boolean
     },
-    image: {
+    images: {
         type: [String]
     },
     phoneNumber: {
