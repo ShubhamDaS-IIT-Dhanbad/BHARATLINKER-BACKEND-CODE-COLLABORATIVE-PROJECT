@@ -9,7 +9,11 @@ dotenv.config();
 const app = express();
 app.use(helmet());
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
+const allowedOrigins = [
+  'https://www.bharatlinker.shop', 
+  'http://localhost:5173'
+];
+
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -18,10 +22,10 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'));
     }
   },
+  credentials: true, // Include credentials such as cookies, authorization headers, etc.
 };
-app.use(cors({
-  origin: 'https://www.bharatlinker.shop' // replace with your frontend URL
-}));
+
+app.use(cors(corsOptions));
 
 // Logging middleware
 app.use(morgan('combined'));
