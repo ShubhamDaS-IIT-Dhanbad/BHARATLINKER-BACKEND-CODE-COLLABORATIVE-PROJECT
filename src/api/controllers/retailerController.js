@@ -48,11 +48,23 @@ const registerRetailer = asyncHandler(async (req, res) => {
 })
 //login
 const logInRetailer = asyncHandler(async (req, res) => {
-    const { phoneNumber } = req.body;console.log(req.body,phoneNumber)
+    const { phoneNumber, password } = req.body;
+
     if (!phoneNumber) throw new ApiError(400, "Phone Number Required!");
-console.log(phoneNumber)
+    if (!password) throw new ApiError(400, "Password Required!");
+
     const retailer = await Retailer.findOne({ phoneNumber });
-    if (!retailer) { throw new ApiError(409, "User does not exist"); }
+
+    if (!retailer) {
+        throw new ApiError(409, "User does not exist");
+    }
+
+    // Check if the provided password matches the password stored in the database
+    const passwordMatch = await retailer.comparePassword(password);
+
+    if (!passwordMatch) {
+        throw new ApiError(401, "Invalid password");
+    }
 
     const { accessToken, refreshToken } = await generateAccessRefreshTokens(retailer._id);
 
@@ -82,6 +94,7 @@ console.log(phoneNumber)
             )
         );
 });
+
 //logout
 const logOutRetailer = asyncHandler(async (req, res) => {
 
