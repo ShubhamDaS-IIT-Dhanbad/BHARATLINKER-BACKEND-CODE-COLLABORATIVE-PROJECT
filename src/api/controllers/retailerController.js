@@ -48,33 +48,21 @@ const registerRetailer = asyncHandler(async (req, res) => {
 })
 //login
 const logInRetailer = asyncHandler(async (req, res) => {
-    const { phoneNumber, password } = req.body;
-
-    if (!phoneNumber) throw new ApiError(400, "Phone Number Required!");
-    if (!password) throw new ApiError(400, "Password Required!");
-
+    const { phoneNumber,password } = req.body;
+    if (!phoneNumber || !password) throw new ApiError(400, "Phone Number Required!");
     const retailer = await Retailer.findOne({ phoneNumber });
 
-    if (!retailer) {
-        throw new ApiError(409, "User does not exist");
-    }
-
-    // Check if the provided password matches the password stored in the database
-    const passwordMatch = await retailer.comparePassword(password);
-
-    if (!passwordMatch) {
-        throw new ApiError(401, "Invalid password");
-    }
+    if (!retailer) { throw new ApiError(409, "Phonenumber or password is wrong"); }
+    if (retailer.key!=password) { throw new ApiError(409, "Phonenumber or password is wrong"); }
 
     const { accessToken, refreshToken } = await generateAccessRefreshTokens(retailer._id);
-
     const loggedInRetailer = await Retailer.findById(retailer._id).select("-password -refreshToken");
 
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: 'Strict', // You can adjust this based on your requirements
-        maxAge: 24 * 60 * 60 * 1000 // 1 day in milliseconds
+        sameSite: 'Strict',
+        maxAge: 24 * 60 * 60 * 1000 
     };
 
     const retailerCookieValue = JSON.stringify(loggedInRetailer);
@@ -94,7 +82,6 @@ const logInRetailer = asyncHandler(async (req, res) => {
             )
         );
 });
-
 //logout
 const logOutRetailer = asyncHandler(async (req, res) => {
 

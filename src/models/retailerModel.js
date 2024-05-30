@@ -7,7 +7,7 @@ const retailerSchema = new Schema({
         type: String,
         required: true
     },
-    password: {
+    key: {
         type: String,
         required: true
     },
