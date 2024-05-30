@@ -3,13 +3,14 @@ class ApiFeatures {
         this.query = query;
         this.queryStr = queryStr;
     }
+
     search() {
         if (this.queryStr && this.queryStr.keyword) {
             const keyword = this.queryStr.keyword.trim();
             const words = keyword.split(/\s+/);
             const regex = new RegExp(keyword, 'i');
             const numberKeyword = parseFloat(keyword);
-        
+
             let searchConditions = [
                 { title: { $regex: regex } },
                 { description: { $regex: regex } },
@@ -17,7 +18,7 @@ class ApiFeatures {
                 { brand: { $regex: regex } },
                 { keyWords: { $elemMatch: { $regex: regex } } }
             ];
-        
+
             // Add conditions for each word in the query
             words.forEach(word => {
                 const wordRegex = new RegExp(word, 'i');
@@ -27,15 +28,15 @@ class ApiFeatures {
                 searchConditions.push({ brand: { $regex: wordRegex } });
                 searchConditions.push({ keyWords: { $elemMatch: { $regex: wordRegex } } });
             });
-        
+
             // If keyword is a number, include number-specific search conditions
             if (!isNaN(numberKeyword)) {
                 searchConditions.push({ price: numberKeyword });
                 searchConditions.push({ id: numberKeyword });
             }
-        
+
             // Use an aggregation pipeline to sort by relevance
-            this.query = this.query.aggregate([
+            this.query = this.query.model.aggregate([
                 {
                     $match: {
                         $or: searchConditions
@@ -45,11 +46,11 @@ class ApiFeatures {
                     $addFields: {
                         score: {
                             $sum: [
-                                { $cond: [{ $regexMatch: { input: "$title", regex: regex } }, 10, 0] },
-                                { $cond: [{ $regexMatch: { input: "$description", regex: regex } }, 5, 0] },
-                                { $cond: [{ $regexMatch: { input: "$category", regex: regex } }, 8, 0] },
-                                { $cond: [{ $regexMatch: { input: "$brand", regex: regex } }, 7, 0] },
-                                { $cond: [{ $regexMatch: { input: "$keyWords", regex: regex } }, 6, 0] },
+                                { $cond: [{ $regexMatch: { input: { $ifNull: ["$title", ""] }, regex: regex } }, 10, 0] },
+                                { $cond: [{ $regexMatch: { input: { $ifNull: ["$description", ""] }, regex: regex } }, 5, 0] },
+                                { $cond: [{ $regexMatch: { input: { $ifNull: [{ $arrayElemAt: ["$category", 0] }, ""] }, regex: regex } }, 8, 0] },
+                                { $cond: [{ $regexMatch: { input: { $ifNull: ["$brand", ""] }, regex: regex } }, 7, 0] },
+                                { $cond: [{ $regexMatch: { input: { $ifNull: [{ $arrayElemAt: ["$keyWords", 0] }, ""] }, regex: regex } }, 6, 0] },
                                 // Add more conditions if needed
                             ]
                         }
@@ -64,8 +65,7 @@ class ApiFeatures {
         }
         return this;
     }
-    
-    
+
     pagination(resultPerPage) {
         const currentPage = parseInt(this.queryStr.page) || 1;
         const limit = parseInt(this.queryStr.limit) || resultPerPage;
@@ -75,7 +75,7 @@ class ApiFeatures {
 
         return this;
     }
-    //filter
+
     filter() {
         const queryCopy = { ...this.queryStr };
         const removeFields = ["keyword", "page", "limit"];
@@ -87,17 +87,16 @@ class ApiFeatures {
         }
         return this;
     }
-    //filter by pincode both for product and shop
+
     filterByPincode() {
-        const pincodes = this.queryStr.pincode;console.log("hw")
-        // console.log(pincodes)
+        const pincodes = this.queryStr.pincode;
         if (pincodes) {
             const pincodeArray = pincodes.split(',').map(pin => pin.trim());
             this.query = this.query.find({ pinCodes: { $elemMatch: { $in: pincodeArray } } });
         }
         return this;
     }
-    //filterby catagory product
+
     filterByCategoryProducts() {
         const categories = this.queryStr.categories;
         if (categories) {
@@ -106,7 +105,7 @@ class ApiFeatures {
         }
         return this;
     }
-    // filter by category shop
+
     filterByCategoryShop() {
         const categories = this.queryStr.selectedCategories;
         if (categories) {
@@ -115,11 +114,14 @@ class ApiFeatures {
         }
         return this;
     }
-    // Filter by shop id
+
     filterByShop() {
         const shopId = this.queryStr.shopid;
-        if (shopId) {this.query = this.query.find({ shop: shopId });}
+        if (shopId) {
+            this.query = this.query.find({ shop: shopId });
+        }
         return this;
     }
 }
+
 export { ApiFeatures };
