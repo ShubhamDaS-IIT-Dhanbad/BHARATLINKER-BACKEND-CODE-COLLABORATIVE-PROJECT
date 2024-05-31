@@ -13,7 +13,7 @@ import { retailerVerifyJwt } from '../middleware/retailerAuthMiddleware.js';
 const router = Router();
 
 // Secure routes
-router.route('/addproduct').post(upload.array('images'), createProduct);
+router.route('/addproduct').post(upload.array('imagees'), createProduct);
 router.route('/updateproduct/:id').post(upload.array('images'), updateProduct);
 router.route('/deleteproduct/:id').post(upload.array('images'), deleteProduct);
 
