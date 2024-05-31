@@ -1,6 +1,4 @@
 import { Product } from "../../models/productModel.js";
-import { Retailer } from '../../models/retailerModel.js';
-import { Shop } from '../../models/shopModel.js';
 
 import { ApiError } from '../../utils/apiError.js'
 import { asyncHandler } from "../../utils/asyncHandler.js";
@@ -10,21 +8,23 @@ import { uploadOnCloudinary } from "../../utils/cloudinary.js";
 import fs from "fs";
 import cloudinary from 'cloudinary';
 import { promisify } from "util";
-const unlinkAsync = promisify(fs.unlink);
-
 
 // Create Product -- Retailer
 const createProduct = asyncHandler(async (req, res, next) => {
-  const images =[];
-  for (const file of req.files){
-    const avatarLocalPath = file.path;
-    const imageUrl = await uploadOnCloudinary(avatarLocalPath);
-    images.push(imageUrl.url);}
+  const images = [];
+  const files = req.files;
+  
+  for (const file of files) {
+      const imageUrl = await uploadOnCloudinary(file.buffer, file.originalname);
+      images.push(imageUrl.url);
+  }
+  
   req.body.images = images;
+  
   const product = await Product.create(req.body);
   res.status(201).json({
-    success: true,
-    product
+      success: true,
+      product
   });
 });
 
