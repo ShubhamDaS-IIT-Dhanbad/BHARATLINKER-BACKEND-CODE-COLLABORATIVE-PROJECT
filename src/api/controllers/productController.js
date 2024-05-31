@@ -15,13 +15,11 @@ const unlinkAsync = promisify(fs.unlink);
 
 // Create Product -- Retailer
 const createProduct = asyncHandler(async (req, res, next) => {
-  const images = [];
-  for (const file of req.files) {
-    const avatarLocalPath = `./${file.path}`;
-    console.log("path",avatarLocalPath)
+  const images =[];
+  for (const file of req.files){
+    const avatarLocalPath = file.path;
     const imageUrl = await uploadOnCloudinary(avatarLocalPath);
-    images.push(imageUrl.url);
-  }
+    images.push(imageUrl.url);}
   req.body.images = images;
   const product = await Product.create(req.body);
   res.status(201).json({
