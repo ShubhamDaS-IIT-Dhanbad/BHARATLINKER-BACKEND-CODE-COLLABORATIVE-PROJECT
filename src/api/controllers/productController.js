@@ -17,7 +17,8 @@ const unlinkAsync = promisify(fs.unlink);
 const createProduct = asyncHandler(async (req, res, next) => {
   const images = [];
   for (const file of req.files) {
-    const avatarLocalPath = file.path;
+    const avatarLocalPath = `./${file.path}`;
+    console.log("path",avatarLocalPath)
     const imageUrl = await uploadOnCloudinary(avatarLocalPath);
     images.push(imageUrl.url);
   }
