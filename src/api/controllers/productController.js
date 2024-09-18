@@ -28,33 +28,45 @@ const createProduct = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Get All Product
+
+
+
 const getAllProducts = asyncHandler(async (req, res, next) => {
-  const resultPerPage = 90;
-  const currentPage = Number(req.query.page) || 1;
+  try {
+      const resultPerPage = 90;
+      const currentPage = Number(req.query.page) || 1;
 
-  const productsCount = await Product.countDocuments();
-  const apiFeature = new ApiFeatures(Product.find(), req.query)
-    .search()
-    .filter()
-    .filterByPincode()
-    .pagination(resultPerPage)
-    .filterByCategoryProducts()
-    .filterByShop();
+      // Initialize ApiFeatures with the query and request query parameters
+      const apiFeature = new ApiFeatures(Product.find(), req.query)
+          .search() // Apply keyword search
+          .filter() // Apply other filters
+          .filterByPincode() // Filter products by pincode
+          .filterByCategoryProducts() // Filter by categories
+          .filterByShop() // Filter by shop
+          .pagination(resultPerPage);
 
-  const products = await apiFeature.query;
-  const filteredProductsCount = await Product.countDocuments(apiFeature.query); // Adjust if necessary
-  const totalPages = Math.ceil(filteredProductsCount / resultPerPage);
+      const products = await apiFeature.query;
 
-  res.status(200).json({
-    success: true,
-    products,
-    productsCount,
-    resultPerPage,
-    filteredProductsCount,
-    totalPages,
-    currentPage,
-  });
+      // Count the number of products after filtering
+      const filteredProductsCount = await Product.countDocuments(apiFeature.query.getFilter());
+
+      // Calculate total pages
+      const totalPages = Math.ceil(filteredProductsCount / resultPerPage);
+
+      // Send the response
+      res.status(200).json({
+          success: true,
+          products,
+          productsCount: await Product.countDocuments(), // Total count before filters
+          resultPerPage,
+          filteredProductsCount,
+          totalPages,
+          currentPage,
+      });
+  } catch (error) {
+      console.error('Error in getAllProducts:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
 });
 
 
@@ -71,6 +83,10 @@ const getRetailerProducts = asyncHandler(async (req, res, next) => {
     next(error);
   }
 });
+
+
+
+
 
 // Get Product Details
 const getProductDetails = asyncHandler(async (req, res, next) => {
@@ -285,5 +301,5 @@ export {
   deleteProduct,
   createProductReview,
   getProductReviews,
-  deleteReview,
+  deleteReview
 }

@@ -10,9 +10,9 @@ import { uploadOnCloudinary } from "../../utils/cloudinary.js";
 
 //add shop modifiued by chargpt
 const registerShop = asyncHandler(async (req, res) => {
-  console.log(req.body)
-  const { phoneNumber, shopName, category, location} = req.body;
-  if (!phoneNumber || !shopName || !category ) {
+  console.log(req.body);
+  const { phoneNumber, shopName, category, location } = req.body;
+  if (!phoneNumber || !shopName || !category) {
     return res.status(400).json(new ApiResponse(400, "Missing required fields: phoneNumber, shopName, category, location, closeDays"));
   }
   if (!location.lat || !location.lon) {
@@ -21,21 +21,13 @@ const registerShop = asyncHandler(async (req, res) => {
 
   try {
     let images = [];
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const result = await uploadOnCloudinary(file.path);
-        images.push(result.url);
-      }
-    }
-
+    const files = req.files;
+    for (const file of files) {
+      const imageUrl = await uploadOnCloudinary(file.buffer, file.originalname);
+      images.push(imageUrl.url);
+  }
     const createdShop = await Shop.create({ ...req.body, images });
-    // const retailer = await Retailer.findById(req.cookies.retailer._id);
-    // if (!retailer) {
-    //   await Shop.findByIdAndDelete(createdShop._id);
-    //   return res.status(404).json(new ApiResponse(404, "Retailer not found"));// }
-    // retailer.shop = createdShop._id;
-    // await retailer.save();
-
+   
     return res.status(201).json(new ApiResponse(201, "Shop registered successfully", createdShop));
   } catch (error) {
     console.error("Error creating shop:", error);
