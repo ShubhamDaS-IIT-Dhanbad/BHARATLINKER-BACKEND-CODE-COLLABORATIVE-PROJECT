@@ -70,14 +70,36 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
 });
 
 
-// Get All Product retailer
 const getRetailerProducts = asyncHandler(async (req, res, next) => {
-  const { shopId } = req.params;console.log(shopId)
+  const { shopId, page = 1, limit = 5 } = req.query;
+
+  if (!shopId) {
+    return res.status(400).json({
+      success: false,
+      message: "Shop ID is required",
+    });
+  }
+
+  // Correctly parse page and limit with a radix of 10
+  const pageNumber = parseInt(page, 10);
+  const limitNumber = parseInt(limit, 10);
+  const skip = (pageNumber - 1) * limitNumber; // Calculate how many records to skip
+
   try {
-    const products = await Product.find({ shop:shopId });
+    // Fetch products for the shop with pagination
+    const products = await Product.find({ shop: shopId })
+      .skip(skip) // Skip the first (page - 1) * limit products
+      .limit(limitNumber); // Limit the result to the number specified in the limit
+    
+    // Get the total count of products for the shop (for frontend to know how many pages there are)
+    const totalProducts = await Product.countDocuments({ shop: shopId });
+
     res.status(200).json({
       success: true,
       products,
+      totalProducts,
+      page: pageNumber,
+      totalPages: Math.ceil(totalProducts / limitNumber), // Calculate total pages
     });
   } catch (error) {
     next(error);

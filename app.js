@@ -12,7 +12,7 @@ app.use(helmet());
 const allowedOrigins = [
   'https://www.bharatlinker.shop', 
   'http://localhost:5173',
-  'http://192.168.56.1:5173',
+  'http://192.168.215.200:5173/',
   'http://192.168.215.200:5173',
   'https://bharatlinker-beta.vercel.app'
 ];

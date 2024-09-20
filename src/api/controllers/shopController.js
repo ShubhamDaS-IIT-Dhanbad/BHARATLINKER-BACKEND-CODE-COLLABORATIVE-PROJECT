@@ -68,27 +68,35 @@ const getShopDetails = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Get All shops
 const getAllShops = asyncHandler(async (req, res, next) => {
-  const resultPerPage = 8;
-  const shopCount = await Shop.countDocuments();
-  const apiFeature = new ApiFeatures(Shop.find(), req.query)
-  .search()
-  .filter()
-  .filterByCategoryShop()
-  .filterByPincode()
-  .pagination(20);
+  try {
+    const resultPerPage = 8; // Number of results per page
+    const shopCount = await Shop.countDocuments(); // Total count of shops
 
+    // Create an instance of ApiFeatures with filtering and pagination methods
+    const apiFeature = new ApiFeatures(Shop.find(), req.query)
+      .search()
+      .filter()
+      .filterByCategoryProducts() // Ensure this matches the method name
+      .filterByPincode()
+      .filterByShop()
+      .pagination(resultPerPage); // Pass resultPerPage here
 
-  const shops = await apiFeature.query;
-  const filteredShopsCount = shops.length;
-  res.status(200).json({
-    success: true,
-    shops,
-    shopCount,
-    resultPerPage,
-    filteredShopsCount,
-  });
+    // Execute the query
+    const shops = await apiFeature.query;
+    const filteredShopsCount = shops.length; // Number of shops after filtering
+
+    // Send the response
+    res.status(200).json({
+      success: true,
+      shops,
+      shopCount,
+      resultPerPage,
+      filteredShopsCount,
+    });
+  } catch (error) {
+    next(error); // Pass error to the error-handling middleware
+  }
 });
 
 export {

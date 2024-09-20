@@ -22,7 +22,7 @@ router.route('/products/').get(getAllProducts);
 // router.route('/search/products/querypincode/:keyword').get(filterbypincodeandquery);
 router.route('/retailer/products/:shopId').get(getRetailerProducts);
 router.route('/productsdetail/:id').get(getProductDetails);
-router.route('/retailerproducts').get(getRetailerProducts);
+router.route('/retailerproducts/').get(getRetailerProducts);
 
 export default router;
 
