@@ -32,12 +32,25 @@ class ApiFeatures {
 
     filterByCategoryProducts() {
         const categories = this.queryStr.categories;
+        console.log("ko",categories)
         if (categories) {
             const categoryArray = categories.split(',').map(category => category.trim());
             this.query = this.query.find({ category: { $elemMatch: { $in: categoryArray } } });
         }
         return this;
     }
+
+
+    filterByBrand() {
+        const brands = this.queryStr.brands;
+        console.log("br", brands);
+        if (brands) {
+            const brandArray = brands.split(',').map(brand => brand.trim());
+            this.query = this.query.find({ brand: { $in: brandArray } });
+        }
+        return this;
+    }
+    
 
     filterByShop() {
         const shopId = this.queryStr.shopid;

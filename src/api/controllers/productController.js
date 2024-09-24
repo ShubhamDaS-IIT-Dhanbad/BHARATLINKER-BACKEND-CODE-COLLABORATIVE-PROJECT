@@ -33,41 +33,47 @@ const createProduct = asyncHandler(async (req, res, next) => {
 
 const getAllProducts = asyncHandler(async (req, res, next) => {
   try {
-      const resultPerPage = 90;
-      const currentPage = Number(req.query.page) || 1;
+    const resultPerPage = 90;
+    const currentPage = Number(req.query.page) || 1;
+console.log(req.query)
+    // Initialize ApiFeatures with the query and request query parameters
+    const apiFeature = new ApiFeatures(Product.find(), req.query)
+      .search() // Apply keyword search
+      .filter() // Apply other filters
+      .filterByPincode() // Filter products by pincode
+      .filterByCategoryProducts() // Filter by categories
+      .filterByShop() // Filter by shop
+      .filterByBrand() // Filter by brand
+      .pagination(resultPerPage); // Apply pagination
 
-      // Initialize ApiFeatures with the query and request query parameters
-      const apiFeature = new ApiFeatures(Product.find(), req.query)
-          .search() // Apply keyword search
-          .filter() // Apply other filters
-          .filterByPincode() // Filter products by pincode
-          .filterByCategoryProducts() // Filter by categories
-          .filterByShop() // Filter by shop
-          .pagination(resultPerPage);
+    // Get the filtered products
+    const products = await apiFeature.query;
 
-      const products = await apiFeature.query;
+    // Count the filtered products
+    const filteredProductsCount = await Product.countDocuments(apiFeature.query.getFilter());
 
-      // Count the number of products after filtering
-      const filteredProductsCount = await Product.countDocuments(apiFeature.query.getFilter());
+    // Get the total number of products (before filters)
+    const totalProductsCount = await Product.countDocuments();
 
-      // Calculate total pages
-      const totalPages = Math.ceil(filteredProductsCount / resultPerPage);
+    // Calculate total pages
+    const totalPages = Math.ceil(filteredProductsCount / resultPerPage);
 
-      // Send the response
-      res.status(200).json({
-          success: true,
-          products,
-          productsCount: await Product.countDocuments(), // Total count before filters
-          resultPerPage,
-          filteredProductsCount,
-          totalPages,
-          currentPage,
-      });
+    // Send the response
+    res.status(200).json({
+      success: true,
+      products,
+      productsCount: totalProductsCount, // Total products before filters
+      resultPerPage,
+      filteredProductsCount,
+      totalPages,
+      currentPage,
+    });
   } catch (error) {
-      console.error('Error in getAllProducts:', error);
-      res.status(500).json({ message: 'Internal Server Error' });
+    console.error('Error in getAllProducts:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
 
 
 const getRetailerProducts = asyncHandler(async (req, res, next) => {
