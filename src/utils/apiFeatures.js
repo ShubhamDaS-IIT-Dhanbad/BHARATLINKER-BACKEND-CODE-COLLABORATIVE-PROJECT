@@ -21,6 +21,20 @@ class ApiFeatures {
         return this;
     }
 
+    searchShop() {
+        const keyword = this.queryStr.keyword ? this.queryStr.keyword.trim() : '';
+        console.log(keyword)
+        if (keyword) {
+            const regex = new RegExp(keyword, 'i');
+            this.query = this.query.find({
+                $or: [
+                    { shopName: { $regex: regex } },
+                ]
+            });
+        }
+        return this;
+    }
+
     filterByPincode() {
         const pincode = this.queryStr.pincode;
         if (pincode) {

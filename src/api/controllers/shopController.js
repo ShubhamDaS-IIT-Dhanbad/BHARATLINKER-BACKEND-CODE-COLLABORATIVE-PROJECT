@@ -75,12 +75,7 @@ const getAllShops = asyncHandler(async (req, res, next) => {
 
     // Create an instance of ApiFeatures with filtering and pagination methods
     const apiFeature = new ApiFeatures(Shop.find(), req.query)
-      .search()
-      .filter()
-      .filterByCategoryProducts() // Ensure this matches the method name
-      .filterByPincode()
-      .filterByShop()
-      .pagination(resultPerPage); // Pass resultPerPage here
+      .searchShop()
 
     // Execute the query
     const shops = await apiFeature.query;

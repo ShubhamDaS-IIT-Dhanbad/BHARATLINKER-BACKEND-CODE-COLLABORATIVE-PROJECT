@@ -35,7 +35,7 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
   try {
     const resultPerPage = 90;
     const currentPage = Number(req.query.page) || 1;
-console.log(req.query)
+    
     // Initialize ApiFeatures with the query and request query parameters
     const apiFeature = new ApiFeatures(Product.find(), req.query)
       .search() // Apply keyword search

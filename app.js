@@ -12,17 +12,10 @@ app.use(helmet());
 const allowedOrigins = [
   'https://www.bharatlinker.shop', 
   'http://localhost:5173',
-  'http://192.168.215.200:5173',
-  'http://192.168.215.200:5173',
   'https://bharatlinker-beta.vercel.app',
   'http://192.168.137.1:5173',
   'http://192.168.32.200:5173',
-  'https://www.bharatlinker.shop', 
-  'http://localhost:5173',
-  'http://192.168.215.200:5173/',
-  'http://192.168.215.200:5173',
-  'https://bharatlinker-beta.vercel.app',
-  'https://bharatlinker.b-cdn.net'
+  'http://192.168.215.200:5173'
 ];
 
 const corsOptions = {
